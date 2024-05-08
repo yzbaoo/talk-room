@@ -17,8 +17,7 @@ const io = new socketIoServer(server, {
   }
 });
 
-const _rooms = new Map();
-
+// 设置最大用户数
 const maxUsers = 2;
 
 // 监听连接事件
@@ -38,6 +37,14 @@ io.on('connection', socket => {
           socketId: socket.id
         }
       });
+    }else {
+      // 向指定的客户端发送错误消息,这其实就是指定自己
+      io.to(socketId).emit('message', {
+        type: 'error',
+        payload: {
+          error: '房间已满'
+        }
+      })
     }
   })
 

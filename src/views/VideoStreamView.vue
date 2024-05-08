@@ -27,15 +27,15 @@ export default {
       localStream: null
     }
   },
-  // watch: {
-  //   remotes: {
-  //     handler(newVal, oldVal) {
-  //       console.error("🚀 ~ remotes ~ newVal:", newVal)
-  //       console.error("🚀 ~ remotes ~ oldVal:", oldVal)
-  //     },
-  //     deep: true
-  //   }
-  // },
+  watch: {
+    remotes: {
+      handler(newVal, oldVal) {
+        console.error("🚀 ~ remotes ~ newVal:", newVal)
+        console.error("🚀 ~ remotes ~ oldVal:", oldVal)
+      },
+      deep: true
+    }
+  },
   async mounted() {
     let roomId = this.$route.query.roomId
     if(!roomId) {
@@ -94,6 +94,13 @@ export default {
           case 'candidate': {
             const peerConnection = this.remotes[message.payload.socketId].pc
             await peerConnection.addIceCandidate(new RTCIceCandidate(message.payload.candidate))
+            break
+          }
+          case 'leave': {
+            // 注意:当房间内的人离开时,需要关闭对应的点对点连接,减少资源占用
+            const peerConnection = this.remotes[message.payload.socketId].pc
+            peerConnection.close()
+            delete this.remotes[message.payload.socketId]
             break
           }
           case 'error': {

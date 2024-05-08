@@ -27,7 +27,9 @@ io.on('connection', socket => {
   // 加入房间
   socket.on('join', roomId => {
     const clients = io.sockets.adapter.rooms.get(roomId)
-    if(!clients || (clients && clients.size <= maxUsers)) {
+    console.log('clients:', clients);
+    console.log('socket.rooms:', socket.rooms);
+    if(!clients || (clients && clients.size < maxUsers)) {
       socket.join(roomId);
       // 通知房间内的其他客户端
       socket.to(roomId).emit('message', {
@@ -39,7 +41,7 @@ io.on('connection', socket => {
       });
     }else {
       // 向指定的客户端发送错误消息,这其实就是指定自己
-      io.to(socketId).emit('message', {
+      io.to(socket.id).emit('message', {
         type: 'error',
         payload: {
           error: '房间已满'
@@ -57,25 +59,21 @@ io.on('connection', socket => {
     }
   })
 
-  // // 离开房间
-  // socket.on('leaveRoom', params => {
-  //   socket.leave(params.shareCode);
-  // })
-
-  // // 处理offer
-  // socket.on('sendSDPOffer', message => {
-
-  //   io.emit('receiveSDPOffer', message);
-  // });
-
-  // // 处理answer
-  // socket.on('sendSDPAnswer', message => {
-  //   io.emit('receiveSDPAnswer', message);
-  // })
-
-  // 监听连接断开事件
-  socket.on('disconnect', () => {
-    console.log('User disconnected.:', socket.id);
+  // 监听连接断开事件 https://socket.io/zh-CN/docs/v4/server-socket-instance/#disconnecting
+  socket.on('disconnecting', () => {
+    console.log('socket.rooms:',socket.rooms)
+    // 通知房间内的其他客户端
+    // socket.rooms表示当前所在的所有房间: https://socket.io/zh-CN/docs/v4/server-socket-instance/#socketrooms
+    for (const room of socket.rooms) {
+      if (room !== socket.id) {
+        socket.to(room).emit("message", {
+          type: 'leave',
+          payload: {
+            socketId: socket.id
+          }
+        });
+      }
+    }
   });
 });
 

@@ -6,13 +6,12 @@
     <button @click="handleClick">邀请好友</button>
     <div class="video-container">
       <div class="video-player">
+        <span>我</span>
         <video ref="localPlayer" autoplay></video>
       </div>
-      <div class="remotes-container">
-        <div v-for="(value, socketId) in remotes" :key="socketId" class="video-player">
-          <div>用户:{{socketId}}</div>
-          <video :ref="socketId" :id="socketId" autoplay></video>
-        </div>
+      <div v-for="(value, socketId) in remotes" :key="socketId" class="video-player">
+        <span>{{socketId}}</span>
+        <video :ref="socketId" :id="socketId" autoplay></video>
       </div>
     </div>
   </div>
@@ -169,9 +168,18 @@ export default {
     justify-content: center;
     align-items: center;
     width: 100%;
+    flex-wrap: wrap;
   }
   .video-player {
     flex: 1;
-    object-fit: cover;
+    width: 50%;
+    height: auto;
+  }
+  .name {
+    display: inline-block;
+  }
+  .video-player > video {
+    width: 100%;
+    height: auto;
   }
   </style>

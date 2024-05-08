@@ -18,7 +18,7 @@ const io = new socketIoServer(server, {
 });
 
 // 设置最大用户数
-const maxUsers = 2;
+const maxUsers = 4;
 
 // 监听连接事件
 io.on('connection', socket => {

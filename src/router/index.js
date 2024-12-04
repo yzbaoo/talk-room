@@ -5,10 +5,6 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/video-stream',
-    },
-    {
-      path: '/video-stream',
       name: 'video-stream',
       component: () => import('../views/VideoStreamView.vue')
     }
